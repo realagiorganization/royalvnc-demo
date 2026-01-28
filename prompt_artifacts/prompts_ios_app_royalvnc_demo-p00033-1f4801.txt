@@ -1,0 +1,14 @@
+Prompt ID: prompts_ios_app_royalvnc_demo-p00033-1f4801\nTimestamp: 2026-01-28T00:32:48.682466Z\nSource: discord\nQueue: cfb0b9e0e3a345efaf9606b77f9391ea::prompt_queue::discord_1353735964635435100_1353735964635435100_1462903201316606013_realagicorp_iosapp_prompts_ios_app_royalvnc_demo_1462903201316606013_json\nRun: 1/1\nContent:\nDiscord channel: prompts_ios_app_royalvnc_demo\nChannel ID: 1462903201316606013\nQueue label: prompts_ios_app_royalvnc_demo\nMessages aggregated: 6\nAttachments saved for execution (2): attachments/image-aca5e.png, attachments/image-b9491.png | mounted at .prompt_attachments/prompts_ios_app_royalvnc_demo-p00033-1f4801\nAttachment locations:\n- image-aca5e.png (144032 bytes) -> .prompt_attachments/prompts_ios_app_royalvnc_demo-p00033-1f4801/image-aca5e.png\n- image-b9491.png (92808 bytes) -> .prompt_attachments/prompts_ios_app_royalvnc_demo-p00033-1f4801/image-b9491.png\n\nDiscord channel: prompts_ios_app_royalvnc_demo | ID: 1462903201316606013 | Reaction filter: :white_check_mark:
+
+Messages with required reaction:
+[1] (2026-01-19T20:15:07.563+00:00 | realagiadmin_29264 | id=1462903222044856482) work in https://github.com/realagiorganization/royalvnc-demo
+[2] (2026-01-19T20:15:19.188+00:00 | realagiadmin_29264 | id=1462903270803505213) Develop GitHub actions that build test and deploy release version of app to TestFlight, add GitHub actions badges
+[3] (2026-01-21T22:50:33.911+00:00 | realagiadmin_29264 | id=1463667115314905088) test/screenshot github pages website
+Attachments: image.png: /out/1353735964635435100/_media/image-aca5e.png ; image.png: /out/1353735964635435100/_media/image-b9491.png
+[4] (2026-01-22T08:26:05.758+00:00 | mermaid10121 | id=1463811952378904710) Add badges for each GitHub action to README and gif of ui testing
+[5] (2026-01-25T20:21:48.045+00:00 | realagiadmin_29264 | id=1465079228981575731) Create DEVPLAN.md outlining steps for developing this project, mention there all external dependencies that leverage parts of functionality needed
+
+Create BDD test suite describing principal use cases
+
+Create GitHub actions launching BDD suite and add its badge to README. If behavior includes either console or UI / Web user interaction, record it with vhs action and post gif into README
+[6] (2026-01-27T21:26:47.033+00:00 | drybox | id=1465820358253740103) always_on_hint\n
