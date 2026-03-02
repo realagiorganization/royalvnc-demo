@@ -1,0 +1,38 @@
+name: Pages Screenshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  screenshot:
+    name: Capture GitHub Pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Capture screenshot
+        env:
+          PAGES_URL: ${{ vars.PAGES_URL }}
+          SCREENSHOT_PATH: docs/pages.png
+        run: node scripts/screenshot_pages.js
+
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-screenshot
+          path: docs/pages.png

@@ -1,0 +1,101 @@
+name: TestFlight Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Build and Upload to TestFlight
+    runs-on: macos-15
+
+    env:
+      WORKSPACE: RoyalVNC.xcworkspace
+      SCHEME: RoyalVNCiOSDemo
+      CONFIGURATION: Release
+      IOS_DESTINATION: platform=iOS Simulator,name=iPhone 15
+      ARCHIVE_PATH: build/RoyalVNCiOSDemo.xcarchive
+      EXPORT_PATH: build/export
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Import code-signing certificates
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_SIGNING_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.IOS_SIGNING_CERTIFICATE_PASSWORD }}
+
+      - name: Download provisioning profiles
+        uses: apple-actions/download-provisioning-profiles@v3
+        with:
+          bundle-id: ${{ secrets.IOS_BUNDLE_ID }}
+          profile-type: IOS_APP_STORE
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+
+      - name: Build and test (simulator)
+        run: |
+          xcodebuild test \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -destination "$IOS_DESTINATION" \
+            -configuration "$CONFIGURATION" \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      - name: Archive (Release)
+        run: |
+          xcodebuild archive \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -archivePath "$ARCHIVE_PATH" \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      - name: Create export options
+        env:
+          APP_STORE_TEAM_ID: ${{ secrets.APP_STORE_TEAM_ID }}
+          IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+          IOS_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+        run: |
+          cat > exportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${APP_STORE_TEAM_ID}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${IOS_BUNDLE_ID}</key>
+              <string>${IOS_PROFILE_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist exportOptions.plist \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: ${{ env.EXPORT_PATH }}/RoyalVNCiOSDemo.ipa
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}

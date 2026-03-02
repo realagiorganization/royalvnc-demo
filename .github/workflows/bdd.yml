@@ -1,0 +1,36 @@
+name: BDD Suite
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  bdd:
+    name: Run BDD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Run BDD suite
+        run: python3 bdd/run_bdd.py
+
+      - name: Prepare GIF output
+        run: mkdir -p docs
+
+      - name: Record BDD run
+        uses: charmbracelet/vhs-action@v2
+        with:
+          path: bdd/bdd.tape
+
+      - name: Upload BDD GIF
+        uses: actions/upload-artifact@v4
+        with:
+          name: bdd-gif
+          path: docs/bdd.gif
